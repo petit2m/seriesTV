@@ -1,21 +1,30 @@
 parameters:
-    database_driver:   pdo_mysql
-    database_host:     127.0.0.1
-    database_port:     ~
-    database_name:     symfony
-    database_user:     root
-    database_password: ~
-    # You should uncomment this if you want use pdo_sqlite
-    # database_path: "%kernel.root_dir%/data.db3"
+    #mysql config
+    database_driver: 
+    database_host: 
+    database_port:
+    database_name: 
+    database_user: 
+    database_password: 
 
-    mailer_transport:  smtp
-    mailer_host:       127.0.0.1
-    mailer_user:       ~
-    mailer_password:   ~
+    #mailer 
+    mailer_transport: 
+    mailer_host: 
+    mailer_user: 
+    mailer_password: 
+    locale: 
+    secret: 
 
-    locale:            en
-    secret:            ThisTokenIsNotSoSecretChangeIt
+    #serviio
+    serviio_server: 
+    serviio_password:    
 
-    debug_toolbar:          true
-    debug_redirects:        false
-    use_assetic_controller: true
+    #tvdb
+    tvdb_server: 
+    tvdb_api_key: 
+        
+    #Betaseries
+    bs_api_key:
+    bs_server:
+    bs_user:
+    bs_md5_password:

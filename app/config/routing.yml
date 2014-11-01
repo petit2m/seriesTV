@@ -1,0 +1,8 @@
+app:
+    resource: "@AppBundle/Controller/"
+    type:     annotation
+    prefix:   /
+
+series_app_homepage:
+    pattern:  /{format}
+    defaults: { _controller: AppBundle:Default:index, format: json }

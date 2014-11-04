@@ -10,30 +10,26 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 class DefaultController extends Controller
 {
-   /* public function indexAction($format)
+    public function bsAction($format)
     {
-        $server = $this->container->getParameter('bs_server');
-        $apiKey = $this->container->getParameter('bs_api_key');
-        $user = $this->container->getParameter('bs_user');
-        $password = $this->container->getParameter('bs_md5_password');
+        $serviceBS = $this->get('serviceBS');
+        $serviceBS->login();
+        $series = $serviceBS->getNotifications(100,250719216);
+        $serviceBS->logout();
         
-        $serviceBS = new ServiceBS($format, $server, $apiKey);
-        $serviceBS->login($user, $password);
-        $series = $serviceBS->getNotifications(100);
-    
-         return $this->render('AppBundle:Default:index.html.twig',array('serie' => var_export($series,true)));
+        return $this->render('AppBundle:Default:index.html.twig',array('serie' => var_export($series,true)));
     }
-    */
+    
     /* TEST SERVIIO */
-    public function indexAction($format)
+    public function serviioAction()
     {
 		
 	   $server = $this->container->getParameter('serviio_server');
        $password       = $this->container->getParameter('serviio_password');
-       $serviceServiio = new ServiceServiio($format, $server ,$password);
-       $series = $serviceServiio->getAllSeriesId();
-
-       /* foreach ($series as $idSerie => $seasons) {
+       $serviceServiio = new ServiceServiio($server ,$password);
+       $series = $serviceServiio->getSeries();
+       /*
+        foreach ($series as $idSerie => $seasons) {
             list($idSerieServiio, $serieName) = explode(',',$idSerie);  
             echo $serieName.'<br>';
              foreach ($seasons as $idSeason => $episodes) {
@@ -52,17 +48,17 @@ class DefaultController extends Controller
     
     
     // TEST TVDB
-    // public function indexAction($format)
-    // {
-    //     $server = $this->container->getParameter('tvdb_server');
-    //     $apiKey = $this->container->getParameter('tvdb_api_key');
-    //     $tvdb = new ServiceTvdb($server,$apiKey);
+     public function tvdbAction()
+     {
+         $server = $this->container->getParameter('tvdb_server');
+         $apiKey = $this->container->getParameter('tvdb_api_key');
+         $tvdb = new ServiceTvdb($server,$apiKey);
 
-    //     // print_r($tvdb->getSerieByName('Walking Dead'));
-    //     // print_r($tvdb->getEpisodesBySerieId(221451));
-    //     print_r($tvdb->getEpisodeById(4185563));
-    //     die;
-    //    // return $this->render('SamsungServiioAppBundle:Default:index.html.twig',array('series'=>$series));
-    // }
+         // print_r($tvdb->getSerieByName('Walking Dead'));
+         // print_r($tvdb->getEpisodesBySerieId(221451));
+         print_r($tvdb->getEpisodeById(250853526));
+         die;
+         return $this->render('SamsungServiioAppBundle:Default:index.html.twig',array('serie'=>$series));
+     }
 }
 

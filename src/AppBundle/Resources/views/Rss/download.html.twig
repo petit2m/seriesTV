@@ -1,0 +1,9 @@
+{% extends 'base.html.twig' %} 
+{% block test %}
+    <div id="download-list">
+    {% for episode in download %}
+        <a href="{{episode.url}}">{{ episode.name }}</a>
+    {% endfor %}
+        
+    </div>
+{% endblock %}

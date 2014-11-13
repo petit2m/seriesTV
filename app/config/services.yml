@@ -1,0 +1,11 @@
+# Services
+services:
+    serviceBS:
+        class:      AppBundle\Business\ServiceBS
+        arguments:  ["%bs_server%","%bs_api_key%","%bs_user%","%bs_md5_password%"]
+    serviceServiio:
+        class:      AppBundle\Business\ServiceServiio
+        arguments:  ["%serviio_server%","%serviio_password%"]
+    serviceTvdb:
+        class:      AppBundle\Business\ServiceTvdb
+        arguments:  ["%tvdb_server%","%tvdb_api_key%"]

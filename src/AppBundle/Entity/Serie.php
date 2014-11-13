@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
  * Serie
  *
  * @ORM\Table(name="Serie")
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="AppBundle\Entity\SerieRepository")
  */
 class Serie
 {
@@ -31,7 +31,7 @@ class Serie
     /**
      * @var string
      *
-     * @ORM\Column(name="id_serviio", type="string", length=25, nullable=true)
+     * @ORM\Column(name="id_serviio", type="string", length=25, nullable=true, unique=true)
      */
     private $idServiio;
 
@@ -43,18 +43,25 @@ class Serie
     private $name;
 
     /**
-     * @var \DateTime
+     * @var integer
      *
-     * @ORM\Column(name="first_aired", type="datetime", nullable=true)
+     * @ORM\Column(name="nb_season", type="integer", options={"default":1})
      */
-    private $firstAired;
+    private $nbSeason;
 
     /**
-     * @var string
+     * @var integer
      *
-     * @ORM\Column(name="network", type="string", length=45, nullable=true)
+     * @ORM\Column(name="remaining", type="integer", nullable=true)
      */
-    private $network;
+    private $remaining;
+
+    /**
+     * @var boolean
+     *
+     * @ORM\Column(name="archived", type="boolean", options={"default":0})
+     */
+    private $archived=0;
 
 
 
@@ -138,48 +145,71 @@ class Serie
     }
 
     /**
-     * Set firstAired
+     * Set nbSeason
      *
-     * @param \DateTime $firstAired
+     * @param integer $nbSeason
      * @return Serie
      */
-    public function setFirstAired($firstAired)
+    public function setNbSeason($nbSeason)
     {
-        $this->firstAired = $firstAired;
-    
+        $this->nbSeason = $nbSeason;
+
         return $this;
     }
 
     /**
-     * Get firstAired
+     * Get nbSeason
      *
-     * @return \DateTime 
+     * @return integer 
      */
-    public function getFirstAired()
+    public function getNbSeason()
     {
-        return $this->firstAired;
+        return $this->nbSeason;
     }
 
     /**
-     * Set network
+     * Set archived
      *
-     * @param string $network
+     * @param boolean $archived
      * @return Serie
      */
-    public function setNetwork($network)
+    public function setArchived($archived)
     {
-        $this->network = $network;
-    
+        $this->archived = $archived;
+
         return $this;
     }
 
     /**
-     * Get network
+     * Get archived
      *
-     * @return string 
+     * @return boolean 
      */
-    public function getNetwork()
+    public function getArchived()
     {
-        return $this->network;
+        return $this->archived;
+    }
+
+    /**
+     * Set remaining
+     *
+     * @param integer $remaining
+     * @return Serie
+     */
+    public function setRemaining($remaining)
+    {
+        $this->remaining = $remaining;
+
+        return $this;
+    }
+
+    /**
+     * Get remaining
+     *
+     * @return integer 
+     */
+    public function getRemaining()
+    {
+        return $this->remaining;
     }
 }

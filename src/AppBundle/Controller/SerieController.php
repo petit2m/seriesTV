@@ -35,20 +35,36 @@ class SerieController extends Controller
     {
         $em     = $this->getDoctrine()->getManager();
         $tvdb   = $this->get('serviceTvdb');
-        $series = $em->getRepository('AppBundle:Serie')->createQueryBuilder('s')
-                                                       ->where('s.idTvdb is NULL')
-                                                       ->getQuery()
-                                                       ->getResult();       
+        $bs     = $this->get('serviceBS');
+        $series = $em->getRepository('AppBundle:Serie')->findAll();       
+        $bs->login();
+        $bsInfos   = $bs->getMemberTvdBSeries(); // un seul appel plutôt qu'un par série
         
         foreach ($series as $serie) {
-            $seriesInfos = $tvdb->getSerieByName($serie->getName());
-            if($seriesInfos)
-                $serie->setIdTvdb($seriesInfos->id);
+            if($serie->getIdTvdb() == NULL){
+                $tvdbInfos = $tvdb->getSerieByName($serie->getName());
+                if($tvdbInfos)
+                    $serie->setIdTvdb($tvdbInfos->id);
+            }           
+            
+            if(isset($bsInfos[$serie->getIdTvdb()])){
+                $serieInfo = $bsInfos[$serie->getIdTvdb()];
+                $serie->setNbSeason($serieInfo['seasons']);
+                if($serieInfo['in_account'] === true){
+                    $serie->setRemaining($serieInfo['user']['remaining']);
+                    $serie->setArchived($serieInfo['user']['archived']);  
+                }
+            }
             
             $em->persist($serie);
         }
         $em->flush();
-        
-        return $this->render('AppBundle:Default:index.html.twig',array('serie'=>var_export($seriesInfos,true)));
+        $bs->logout();
+        return $this->render('AppBundle:Default:index.html.twig',array('serie'=>var_export($series,true)));
+    }
+    
+    public function FunctionName($value='')
+    {
+        # code...
     }  
 }

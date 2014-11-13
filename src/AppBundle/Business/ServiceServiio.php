@@ -7,7 +7,9 @@ use GuzzleHttp\Client;
 /**
 * Class to access serviio APIs services
 */
-
+/*
+    TODO voir coment gérer le cache grace aux ETag contenus dans la réponse ?    
+*/
 class ServiceServiio 
 {
  
@@ -16,21 +18,33 @@ class ServiceServiio
     private $format;
     
     private $header;
+    
+    private $token;
 
-    const HEADER_LENGTH   = "Content-Length: 0";
-    const HEADER_CLOSE    = "Connection: close";
     const ERROR_CODE_NAME = "errorCode";
     const TOKEN_NAME      = "parameter";
     const SERIES_FLAG     = 'V_S';
 
-    function __construct($format, $server, $password)
+    function __construct($server, $password)
     {
         $this->password = $password;
-        $this->format = $format;
-        $this->client = new Client( array('base_url' => $server) );
-        $this->headers = array('headers' => array(self::HEADER_LENGTH,
-                                                  self::HEADER_CLOSE,
+        $this->format = 'json';
+        $this->client = new Client( array('base_url' => $server, 'defaults'=>array('exceptions' => false) ) );
+        $this->headers = array('headers' => array(  
+                                               //  'If-None-Match' => "W/\"9662afdf-9ae0-4e04-9c07-9fb2305074d3\"",
                                                   'Accept' => 'application/json'));
+    }
+
+    public function authenticate()
+    {
+        //if server is up
+        if(!$this->ping())
+            return false;
+        
+        if(!$this->login())
+            return false;
+        
+        return true;
     }
 
     private function ping()
@@ -46,7 +60,7 @@ class ServiceServiio
         if(!$this->ping())
             return false;
 
-        $response = $this->client->get($this->server.'/cds/application');
+        $response = $this->client->get('/cds/application',$this->headers);
         
         return $response->{$this->format}();
     }
@@ -64,62 +78,98 @@ class ServiceServiio
                         )            
                     );
         
-        if($response->getStatusCode() != 200 or !$this->checkErrorCode($response))
+        if($response->getStatusCode() != 200)
             return false;
       
-        return $this->getSimpleParameter($response,self::TOKEN_NAME);
+        $this->token = $this->getSimpleParameter($response,self::TOKEN_NAME);
+        
+        return true;
     }
 
-    public function logout($token)
+    public function logout()
     {
-        $response = $this->client->post('/cds/logout/?authToken='.$token,
-                                        $this->headers
-                                    );
+        $response = $this->client->post('/cds/logout/?authToken='.$this->token, $this->headers);
         if($response->getStatusCode() == 200)
             return true;
 
         return $this->checkErrorCode($response);            
     }
-    // TODO : tester les erreurs
-    public function browse($token, $object_id, $browse_method ='BrowseDirectChildren', $filer='all', $start_index=0, $requested_count=0)
+    
+    
+    
+    public function browse($object_id, $browse_method ='BrowseDirectChildren', $filer='all', $start_index=0, $requested_count=0)
     {       
-         $response = $this->client->get('/cds/browse/1/'.$object_id.'/'.$browse_method.'/'.$filer.'/'.$start_index.'/'.$requested_count.'?authToken='.$token,
-             $this->headers);
+        $response =$this->client->get('/cds/browse/1/'.$object_id.'/'.$browse_method.'/'.$filer.'/'.
+                                      $start_index.'/'.$requested_count.'?authToken='.$this->token, $this->headers);
+        if($response->getStatusCode() != 200)
+            return false;
+         
+        // TODO : tester les erreurs           
+        return $response->json();
+    }
+    
+    
+    public function search($type_file, $term, $start_index=0, $requested_count=0)
+    {       
+        $response = $this->client->get('/cds/search/1/'.$type_file.'/'.$term.'/'.$start_index.'/'.
+                                         $requested_count.'?authToken='.$this->token,$this->headers);
+        if($response->getStatusCode() != 200)
+            return false;
         
         return $response->json();
     }
 	
-    private function recursiveBrowse($token, $object_id)
+    private function recursiveBrowse($object_id)
     {
 		$ret = array();
 		$res = $this->browse($token, $object_id);
-		
+        if(!$res)
+            return false;
+        
         foreach ($res['objects'] as $ressource ) {
             if($ressource['type'] == 'CONTAINER')
                 $ret[$ressource['id'].','.$ressource['title']]= self::recursiveBrowse($token,$ressource['id']);
-            elseif ($ressource['fileType'] == 'VIDEO' && $ressource['contentType'] == 'EPISODE')
+            elseif ($ressource['contentType'] == 'EPISODE'){
+                //var_dump($ressource);
                 foreach($ressource['onlineIdentifiers'] as $identifier)
-                    if($identifier['type'] == 'TVDB')
-                        $ret[] = $identifier['id'];
+                    if($identifier['type'] == 'TVDB'){
+                        $ret[] = $identifier['id'].'-'.$ressource['title'];
+                        break;
+                    }
+                
+            }
         }
         return $ret;
     }
 	
-    public function getAllSeriesId()
+    public function getSeries()
     {
         if(!$this->ping())
             return false;
 
-        $token = $this->login();
-
-        if(!$token)
-            return false;
-
-        $res = $this->recursiveBrowse($token, self::SERIES_FLAG);
-
-        $this->logout($token);
+        $this->login();
+       
+        $res = $this->browse('0');
+        
+        $this->logout();
 
         return $res;
+    }
+    /**
+     * Permet de savoir si la bibliotheque serviio a changé depuis la dernière fois (attention c'est juste si on a ajouté ou supprimé des fichier)
+     *
+     * @param string $etag 
+     * @return void
+     * @author Niko
+     */
+    public function modified($etag)
+    {
+        $response = $this->client->get('/cds/browse/1/0/BrowseDirectChildren/all/0/1?authToken='.$this->token,$this->headers);   
+        
+        if($response->getStatusCode() == 200 && $response->getHeader('ETag') == $etag)
+            return false;
+        else
+           return true;
     }
 
     private function getErrorMessage($error_message)

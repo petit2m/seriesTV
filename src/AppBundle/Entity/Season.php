@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
  * Season
  *
  * @ORM\Table(name="Season")
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="AppBundle\Entity\SeasonRepository")
  */
 class Season
 {
@@ -24,10 +24,17 @@ class Season
     /**
      * @var integer
      *
-     * @ORM\Column(name="id_tvdb", type="integer", nullable=true)
+     * @ORM\Column(name="nb_episode", type="integer",nullable=true)
      */
-    private $idTvdb;
+    private $nbEpisode;
 
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="nb_downloaded_episode", type="integer", nullable=true)
+     */
+    private $nbDownloadedEpisode;
+    
     /**
      * @var string
      *
@@ -139,7 +146,7 @@ class Season
      * @param \Samsung\ServiioAppBundle\Entity\Serie $serie
      * @return Season
      */
-    public function setSerie(\Samsung\ServiioAppBundle\Entity\Serie $serie = null)
+    public function setSerie(Serie $serie = null)
     {
         $this->serie = $serie;
     
@@ -154,5 +161,51 @@ class Season
     public function getSerie()
     {
         return $this->serie;
+    }
+
+    /**
+     * Set nbEpisode
+     *
+     * @param integer $nbEpisode
+     * @return Season
+     */
+    public function setNbEpisode($nbEpisode)
+    {
+        $this->nbEpisode = $nbEpisode;
+
+        return $this;
+    }
+
+    /**
+     * Get nbEpisode
+     *
+     * @return integer 
+     */
+    public function getNbEpisode()
+    {
+        return $this->nbEpisode;
+    }
+
+    /**
+     * Set nbDownloadedEpisode
+     *
+     * @param integer $nbDownloadedEpisode
+     * @return Season
+     */
+    public function setNbDownloadedEpisode($nbDownloadedEpisode)
+    {
+        $this->nbDownloadedEpisode = $nbDownloadedEpisode;
+
+        return $this;
+    }
+
+    /**
+     * Get nbDownloadedEpisode
+     *
+     * @return integer 
+     */
+    public function getNbDownloadedEpisode()
+    {
+        return $this->nbDownloadedEpisode;
     }
 }

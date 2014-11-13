@@ -14,30 +14,34 @@ class EpisodeController extends Controller
     {
         $serviceServiio = $this->get('serviceServiio');
         $em             = $this->getDoctrine()->getManager();
-        $seasons        = $em->getRepository('AppBundle:Season')->findAll();
+        $seasons        = $em->getRepository('AppBundle:Season')->getActive();
         $serviceServiio->authenticate();       
             
         foreach ($seasons as $season) {
-            $episodes = $serviceServiio->browse($season->getIdServiio());
+            $serviioEpisodes = $serviceServiio->browse($season->getIdServiio());
         
-            foreach ($episodes['objects'] as $serviioEpisode) {
+            foreach ($serviioEpisodes['objects'] as $serviioEpisode) {
                 $id = $serviioEpisode['id'];
-                $episode = $em->getRepository('AppBundle:Episode')->findByIdServiio($id);
-                if(!$episode){
+                $episodes = $em->getRepository('AppBundle:Episode')->findByIdServiio($id);
+                if(!$episodes){
                     $episode = new Episode();
                     $episode->setIdServiio($serviioEpisode['id'])
                             ->setName($serviioEpisode['title'])
                             ->setIdTvdb($serviioEpisode["onlineIdentifiers"][0]['id'])
                             ->setSeason($season);
-                }elseif( $serviioEpisode['title'] != $episode->getName()){
-                    $episode->setName($serviioEpisode['title']);
+                }else{
+                    $episode=$episodes[0];
+                    if($serviioEpisode['title'] != $episodes[0]->getName())
+                        $episode->setName($serviioEpisode['title']);
                 }
                 
                 if(false !== strpos($serviioEpisode['title'],'**')){
                     $episode->setWatched(1);
                 }
                 $em->persist($episode); 
-            }    
+            }  
+            $episode->getSeason()->setNbDownloadedEpisode(count($serviioEpisodes['objects']));  
+            $em->persist($season);
         }
         $em->flush();
         $serviceServiio->logout();
@@ -48,12 +52,9 @@ class EpisodeController extends Controller
     // Envoie les nouveaux épisodes téléchargés à betaseries
     public function downloadedAction()
     {
-        $em             = $this->getDoctrine()->getManager();
+        $em       = $this->getDoctrine()->getManager();
         $episodes = $em->getRepository('AppBundle:Episode')
-                            ->createQueryBuilder('e')
-                            ->where('e.downloaded = 0')
-                            ->getQuery()
-                            ->getResult(); 
+                            ->getUndownloaded();
         
         if(count($episodes) == 0)
             return false;      
@@ -82,10 +83,7 @@ class EpisodeController extends Controller
     {
         $em             = $this->getDoctrine()->getManager();
         $episodes = $em->getRepository('AppBundle:Episode')
-                            ->createQueryBuilder('e')
-                            ->where('e.watched = 1')
-                            ->getQuery()
-                            ->getResult(); 
+                            ->getWatched(); 
         
         if(count($episodes) == 0)
             return false;      
@@ -111,8 +109,4 @@ class EpisodeController extends Controller
         return true;
     }
     
-    private function getServiceBS($value='')
-    {
-        # code...
-    }
 }

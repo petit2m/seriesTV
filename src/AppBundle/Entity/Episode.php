@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
  * Episode
  *
  * @ORM\Table(name="Episode")
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="AppBundle\Entity\EpisodeRepository")
  */
 class Episode
 {
@@ -64,11 +64,18 @@ class Episode
     private $firstAired;
 
     /**
-     * @var integer
+     * @var boolean
      *
-     * @ORM\Column(name="last_updated", type="integer", nullable=true)
+     * @ORM\Column(name="downloaded", type="boolean",options={"default":0} )
      */
-    private $lastUpdated;
+    private $downloaded=0;
+    
+    /**
+     * @var boolean
+     *
+     * @ORM\Column(name="watched", type="boolean", options={"default":0})
+     */
+    private $watched=0;
 
     /**
      * @var \Season
@@ -259,7 +266,7 @@ class Episode
      * @param \Samsung\ServiioAppBundle\Entity\Season $season
      * @return Episode
      */
-    public function setSeason(\Samsung\ServiioAppBundle\Entity\Season $season = null)
+    public function setSeason(Season $season = null)
     {
         $this->season = $season;
     
@@ -274,5 +281,51 @@ class Episode
     public function getSeason()
     {
         return $this->season;
+    }
+
+    /**
+     * Set downloaded
+     *
+     * @param boolean $downloaded
+     * @return Episode
+     */
+    public function setDownloaded($downloaded)
+    {
+        $this->downloaded = $downloaded;
+
+        return $this;
+    }
+
+    /**
+     * Get downloaded
+     *
+     * @return boolean 
+     */
+    public function getDownloaded()
+    {
+        return $this->downloaded;
+    }
+
+    /**
+     * Set watched
+     *
+     * @param boolean $watched
+     * @return Episode
+     */
+    public function setWatched($watched)
+    {
+        $this->watched = $watched;
+
+        return $this;
+    }
+
+    /**
+     * Get watched
+     *
+     * @return boolean 
+     */
+    public function getWatched()
+    {
+        return $this->watched;
     }
 }

@@ -2,6 +2,7 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Business\Rss;
 use AppBundle\Business\ServiceServiio;
 use AppBundle\Business\ServiceTvdb;
 use AppBundle\Business\ServiceBS;
@@ -14,7 +15,7 @@ class DefaultController extends Controller
     {
         $serviceBS = $this->get('serviceBS');
         $serviceBS->login();
-        $series = $serviceBS->getNotifications(100,250719216);
+        $series = $serviceBS->getMemberTvdBSeries();
         $serviceBS->logout();
         
         return $this->render('AppBundle:Default:index.html.twig',array('serie' => var_export($series,true)));
@@ -27,7 +28,9 @@ class DefaultController extends Controller
 	   $server = $this->container->getParameter('serviio_server');
        $password       = $this->container->getParameter('serviio_password');
        $serviceServiio = new ServiceServiio($server ,$password);
-       $series = $serviceServiio->getSeries();
+       $serviceServiio->authenticate();
+       $series = $serviceServiio->getInfos('v','VOSTFR');
+      // $series = $serviceServiio->modified("W/\"6a4db39d-2a76-4c94-b1f5-c0bc605f9b02\"");
        /*
         foreach ($series as $idSerie => $seasons) {
             list($idSerieServiio, $serieName) = explode(',',$idSerie);  
@@ -58,7 +61,17 @@ class DefaultController extends Controller
          // print_r($tvdb->getEpisodesBySerieId(221451));
          print_r($tvdb->getEpisodeById(250853526));
          die;
-         return $this->render('SamsungServiioAppBundle:Default:index.html.twig',array('serie'=>$series));
+          return $this->render('AppBundle:Default:index.html.twig',array('serie'=>var_export($series,true)));
      }
+     
+     // TEST TVDB
+      public function rssAction()
+      {
+
+          $rss = new Rss();
+          $series = $rss->parse('http://www.frenchtorrentdb.com/rss/0007b6e7c11075c881/tv_vostfr.rss');
+         
+           return $this->render('AppBundle:Default:index.html.twig',array('serie'=>var_export($series,true)));
+      }
 }
 

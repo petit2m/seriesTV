@@ -28,3 +28,14 @@ parameters:
     bs_server:
     bs_user:
     bs_md5_password:
+
+    #RSS
+    torrent_rss:
+        
+    #DEV
+    use_assetic_controller:
+    debug_toolbar:
+    debug_redirects:
+        
+        
+    

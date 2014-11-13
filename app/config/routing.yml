@@ -3,6 +3,54 @@ app:
     type:     annotation
     prefix:   /
 
-series_app_homepage:
-    pattern:  /{format}
-    defaults: { _controller: AppBundle:Default:index, format: json }
+#SERIES
+series_list:
+    pattern:  /series
+    defaults: { _controller: AppBundle:Serie:listServiio }
+
+series_update:
+    pattern:  /series/infos
+    defaults: { _controller: AppBundle:Serie:updateInfos }
+
+#SEASON
+season_list:
+    pattern: /season
+    defaults: { _controller: AppBundle:Season:listServiio }
+
+season_update:
+    pattern:  /season/infos
+    defaults: { _controller: AppBundle:Season:updateInfos }
+    
+#EPISODE
+episode_list:
+    pattern: /episode
+    defaults: { _controller: AppBundle:Episode:listServiio }
+
+episode_dowloaded:
+    pattern: /episode/downloaded
+    defaults: { _controller: AppBundle:Episode:downloaded }
+
+episode_watched:
+    pattern: /episode/watched
+    defaults: { _controller: AppBundle:Episode:watched }
+#DOWNLOAD
+download_rss:
+   pattern: /download/rss
+   defaults: { _controller: AppBundle:Download:buildRss }
+            
+#TEST           
+series_app_tvdb:
+    pattern:  /tvdb
+    defaults: { _controller: AppBundle:Default:tvdb }
+    
+series_app_serviio:
+    pattern:  /serviio
+    defaults: { _controller: AppBundle:Default:serviio }
+
+series_app_rss:
+    pattern:  /rss
+    defaults: { _controller: AppBundle:Default:rss }
+
+series_app_betaseries:
+    pattern:  /bs/{format}
+    defaults: { _controller: AppBundle:Default:bs, format: json }

@@ -3,28 +3,32 @@
 namespace AppBundle\Business;
 
 
-use Buzz\Browser;
+use GuzzleHttp\Client;
 
 /**
 * Class to access TVDB APIs services
 */
 class ServiceTvdb
 {
-    
-    function __construct($server, $api_key, $language='fr')
+    function __construct($server, $api_key, $language='en')
     {
-        $this->client   = new Browser();
-        $this->server   = $server;
+        $this->language = $language;
         $this->apiKey   = $api_key;
         $this->language = $language;
-    }
+        $this->client = new Client( array('base_url' => $server, 'defaults'=>array('exceptions' => false) ) );
+    }   
+    
+
 
     public function getSerieByName($name)
     {
         $xml = $this->getSimpleXmlResponse('GetSeries.php?seriesname='.urlencode($name).'&language='.$this->language);
         $series = $xml->xpath('//Series');
-
-        return $series[0];
+        
+        if(!empty($series))
+            return $series[0];
+        
+        return false;
     }
 
     public function getSerieById($id)
@@ -70,11 +74,11 @@ class ServiceTvdb
 
     private function getSimpleXmlResponse($url)
     {
-        $response = $this->client->get($this->server.'/api/'.$url);
-        
+        $response = $this->client->get('/api/'.$url);
+   
         if ($response->getStatusCode() != 200)
             return false;
 
-         return simplexml_load_string($response->getContent());
+         return $response->xml();
     }
 }

@@ -3,6 +3,7 @@
 namespace AppBundle\Business;
     
 use GuzzleHttp\Client;
+use GuzzleHttp\Message\Response;
 
 /**
 * Classe to use BetaSeries API
@@ -25,11 +26,10 @@ class ServiceBS
         $this->password = $password;
         $this->client   = new Client( array('base_url' => $server, 'defaults'=>array('exceptions' => false) ) );
         $this->options = array('headers' => array(
-                                    'Accept' => 'application/json',
-                                    'X-BetaSeries-Key'=> $key,
-                                    'X-BetaSeries-Version' => '2.3'            
-                                )
-                             );
+                                    'Accept'               => 'application/json',
+                                    'X-BetaSeries-Key'     => $key,
+                                    'X-BetaSeries-Version' => '2.3')
+                                );
                              
     }
     /**
@@ -41,21 +41,15 @@ class ServiceBS
      */
     public function login() 
     {
-         $this->options['body'] = array('login' => $this->user,
-                                       'password' => $this->password);
-                          
-        $response = $this->client->post('/members/auth', $this->options);
-        unset($this->options['body']);
-        $res = $response->json();
+        $options['body'] = array('login'     => $this->user,
+                                  'password' => $this->password);
+        $response = $this->client->post('/members/auth', array_merge($this->options,$options));
+        $res      = $this->checkResponse($response);
         
-        if ($response->getStatusCode() !== 200 && !empty($res['errors']))
-            $this->checkError($res['errors']);
-    
-        if(isset($res['token']))
-            $token = $res['token'];
-        else // alors la y a un problème...
+        if(!$res)
             return false;
-                
+      
+        $token = $res['token'];        
         $this->options['headers']['X-BetaSeries-Token'] = $token; 
        
         return true; 
@@ -97,13 +91,8 @@ class ServiceBS
     public function getMemberInfo($media_type = 'shows')
     {
         $response = $this->client->get('/members/infos?only='.$media_type, $this->options);
-        
-        if ($response->getStatusCode() != 200)
-            return false;
-        
-        $res = $response->json();
        
-        return $res;
+        return $this->checkResponse($response);
     }
     /**
      * retourne toutes les séries de l'utilisateur connecté
@@ -126,32 +115,26 @@ class ServiceBS
     
     public function getSerieInfo($tvdb_id)
     {
-        $options['body']['thetvdb_id'] = $tvdb_id;
         $response = $this->client->get('/shows/display?thetvdb_id='.$tvdb_id, $this->options);
-        
-        if ($response->getStatusCode() != 200)
-            return false;
             
-        return $response->json();
+        return $this->checkResponse($response);
 
     }
     
     public function getEpisodeToDownload()
     {
         $response = $this->client->get('/episodes/list?limit=1', $this->options);
-        
-        if ($response->getStatusCode() != 200)
+        $series = $this->checkResponse($response);
+      
+        if($series){
+            foreach ($series['shows'] as $serie)
+                if(!$serie['unseen'][0]['user']['downloaded'])
+                    $downloads[str_replace(' ','.',$serie['title']).'.'.str_replace(' ','.',$serie['unseen'][0]['code'])]=
+                        array('id' => $serie['thetvdb_id'],
+                              'id_episode' => $serie['unseen'][0]['thetvdb_id']);
+        }else
             return false;
-            
-        $series = $response->json();
-
-        if(!empty($series)){
-            foreach ($series['shows'] as $serie) {
-                if(!$serie['unseen'][0]['user']['downloaded']){
-                    $downloads[str_replace(' ','.',$serie['title']).'.'.str_replace(' ','.',$serie['unseen'][0]['code'])]='';
-                }
-            }
-        }
+        
         return $downloads;
     }
     
@@ -160,7 +143,7 @@ class ServiceBS
         $options['body']['thetvdb_id'] = $tvdb_id;
         $response = $this->client->post('/shows/show', array_merge($this->options,$options));
         
-        return $response->getStatusCode() == 200 ? true : false;
+        return $this->checkResponse($response);
     }
     
     /**
@@ -184,9 +167,8 @@ class ServiceBS
             $uriParams.='&auto_delete';
         
          $response = $this->client->get('/members/notifications'.$uriParams,$this->options);
-         $res = $response->json();
        
-         return $res;
+         return $this->checkResponse($response);
     }
     /**
      * Marque un épisode comme téléchargé
@@ -197,17 +179,9 @@ class ServiceBS
      */
     public function setDownloaded($tvdb_id)
     {
-        $this->options['body']['thetvdb_id'] = $tvdb_id;
-        $response = $this->client->post('/episodes/downloaded', $this->options);
-        unset($this->options['body']);
+        $response = $this->client->post('/episodes/downloaded', array_merge($this->options,$options));
         
-        if ($response->getStatusCode() != 200){
-             $res = $response->json();
-             echo $this->checkError($res['errors']);
-             return false;
-        }
-      
-        return true;
+        return $this->checkResponse($response);
     }
     
     /**
@@ -220,12 +194,11 @@ class ServiceBS
      */
     public function setWatched($tvdb_id, $bulk=true)
     {
-        $this->options['body'] = array('thetvdb_id' => $tvdb_id,
-                                       'bulk' => $bulk);
-        $response = $this->client->post('/episodes/watched', $this->options);
-        unset($this->options['body']);
-         
-        return $response->getStatusCode() == 200 ? true : false;
+        $options['body'] = array('thetvdb_id' => $tvdb_id,
+                                 'bulk'       => $bulk);
+        $response = $this->client->post('/episodes/watched', array_merge($this->options,$options));
+                 
+        return $this->checkResponse($response);
     }
     
     /**
@@ -237,17 +210,32 @@ class ServiceBS
      */
     private function checkError($tab_error)
     {
-        $errorMessage = '';
-        
-        foreach ($tab_error as $error) {
-            $errorMessage.=$error['text'].' ';
+        foreach ($tab_error as $error)
+           $this->log($error['code'], $error['content']);
+    }
+    /**
+     * traitement du retour d'un service
+     *
+     * @param Response $response la reponse obtenue 
+     * @return false en cas d'erreur / le json obtenu sinon
+     * @author Nicolas
+     */
+    private function checkResponse(Response $response)
+    {
+        if($response->getStatusCode() != 200){
+            if(isset($res['errors']))  // au cas ou le serveur ne soit même pas joignable
+                $this->checkError($res['errors']);
+            
+            return false;
         }
-        return $errorMessage;
-        /*
-            TODO voir ce qu'on fait des messages d'erreur 
-        */
-        // throw new \Exception($errorMessage);
+        
+        return $response->json();
     }
     
+    //TODO : integrer un vrai logger ? monolog ? pour stocker les données en bdd
+    public function log($error_id, $message)
+    {
+        throw new \Exception($errorMessage); //on lève une exception en attendant mieux...
+    }
 }
 ?>

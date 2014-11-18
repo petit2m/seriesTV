@@ -1,0 +1,55 @@
+<?php
+
+namespace AppBundle\Entity;
+
+use Doctrine\ORM\Mapping as ORM;
+
+/**
+ * DownloadList
+ *
+ * @ORM\Table(name="Download_List")
+ * @ORM\Entity(repositoryClass="AppBundle\Entity\DownloadListRepository")
+ */
+class DownloadList
+{
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="id", type="integer", nullable=false)
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="IDENTITY")
+     */
+    private $id;
+
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="id_tvdb", type="integer", nullable=true)
+     */
+    private $idTvdb;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="name", type="string", length=150, nullable=true)
+     */
+    private $name;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="download_url", type="string", length=255, nullable=true)
+     */
+    private $downloadUrl;
+    
+    /**
+     * @var \Serie
+     *
+     * @ORM\ManyToOne(targetEntity="Serie")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="Serie_id", referencedColumnName="id")
+     * })
+     */
+    private $serie;
+  
+}

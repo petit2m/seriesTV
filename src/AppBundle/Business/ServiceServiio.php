@@ -3,6 +3,7 @@
 namespace AppBundle\Business;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Message\Response;
 
 /**
 * Class to access serviio APIs services
@@ -15,8 +16,6 @@ class ServiceServiio
  
     private $client;
 
-    private $format;
-    
     private $header;
     
     private $token;
@@ -28,11 +27,8 @@ class ServiceServiio
     function __construct($server, $password)
     {
         $this->password = $password;
-        $this->format = 'json';
-        $this->client = new Client( array('base_url' => $server, 'defaults'=>array('exceptions' => false) ) );
-        $this->headers = array('headers' => array(  
-                                               //  'If-None-Match' => "W/\"9662afdf-9ae0-4e04-9c07-9fb2305074d3\"",
-                                                  'Accept' => 'application/json'));
+        $this->client   = new Client( array('base_url' => $server, 'defaults'=>array('exceptions' => false) ) );
+        $this->headers  = array('headers' => array('Accept' => 'application/json'));
     }
 
     public function authenticate()
@@ -62,7 +58,7 @@ class ServiceServiio
 
         $response = $this->client->get('/cds/application',$this->headers);
         
-        return $response->{$this->format}();
+        return $response->json();
     }
 
     public function login()
@@ -169,7 +165,7 @@ class ServiceServiio
         if($response->getStatusCode() == 200 && $response->getHeader('ETag') == $etag)
             return false;
         else
-           return true;
+            return true;
     }
 
     private function getErrorMessage($error_message)
@@ -187,7 +183,7 @@ class ServiceServiio
         return isset($SERVIIO_ERROR_CODE[$error_code]) ? $SERVIIO_ERROR_CODE[$error_code] : 'unknown error';  
     }
     
-    private function checkErrorCode(\GuzzleHttp\Message\Response $response)
+    private function checkErrorCode(Response $response)
     {
         $errorCode = $this->getSimpleParameter( $response, self::ERROR_CODE_NAME);
         
@@ -197,9 +193,9 @@ class ServiceServiio
             throw new Exception ($this->getErrorMessage[$errorCode]);
     }
     
-    private function getSimpleParameter(\GuzzleHttp\Message\Response $response, $parameter)
+    private function getSimpleParameter(Response $response, $parameter)
     {
-        $res = $response->{$this->format}();
+        $res = $response->$this->json();
 
         return isset($res[$parameter]) ? $res[$parameter][0] : false;
     }

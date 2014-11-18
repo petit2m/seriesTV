@@ -71,6 +71,16 @@ class ServiceTvdb
     {
         return $this->getSimpleXmlResponse('Updates.php?type=all&time='.$last_update_time);
     }
+    
+    public function getRandomBanner($id)
+    {
+        $xml = getSerieBannersById($id);
+        if($xml){
+            //TODO faire un random sur le count du XML
+        }
+        
+        return true; // retourner l'url (full ?) de la banner
+    }
 
     private function getSimpleXmlResponse($url)
     {
@@ -81,4 +91,6 @@ class ServiceTvdb
 
          return $response->xml();
     }
+    
+    
 }

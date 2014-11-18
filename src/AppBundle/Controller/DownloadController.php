@@ -2,33 +2,57 @@
 
 namespace AppBundle\Controller;
 
-use AppBundle\Entity\Serie;
+use AppBundle\Entity\Donwload;
 use AppBundle\Business\ServiceBS;
 use AppBundle\Business\Rss;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 class DownloadController extends Controller
 {
-    public function buildRssAction()
+    /**
+     * Croise un flux Rss de torrent avec mes données de betaséries pour établir la liste des épisodes à télécharger avec leur lien
+     * Met à jour une table des épisodes à télécharger
+     */
+    public function updateDownloadction()
     {
-        $serviceBS = $this->get('serviceBS');
-        $rss = new Rss();
-        $seriesRss = $rss->parse($this->container->getParameter('torrent_rss'));
+        $em         = $this->getDoctrine()->getManager();      
+        $serviceBS  = $this->get('serviceBS');
+        $rss        = new Rss();
+        $seriesRss  = $rss->parse($this->container->getParameter('torrent_rss'));
         $serviceBS->login();
-        $series = $serviceBS->getEpisodeToDownload();
-        $serviceBS->logout();       
-        $resultats = array_intersect_key($seriesRss,$series);
-        // echo '<pre>';
- //        var_dump($resultats);
- //        echo '</pre>';die;
+        $series     = $serviceBS->getEpisodeToDownload();
+        $serviceBS->logout();
+        $resultats  = array_intersect_key($seriesRss,$series);
+     
         foreach($resultats as $name => $resultat){
             arsort($resultat);
-            $download[$name]=array_shift($resultat);
+            $episode  = array_shift($resultat);
+            $download = $em->getRepository('AppBundle:Download')->findByIdTvdb($series[$name]['id_episode']);
+            $serie    = $em->getRepository('AppBundle:Serie')->findByIdTvdb($series[$name]['id']); 
+
+            if(!$download){
+                 $download = new Download();
+                 $download->setName($resultat['name'])
+                     ->setSerie($serie)
+                     ->setIdTvdb($series[$name]['id_episode']);
+             }
+             $download->setUrl($resultat['url'])
+                 ->setName($resultat['name']);
+             
+             $em->persist($download);
         }
-         // echo '<pre>';
-       //   var_dump($download);
-       //   echo '</pre>';die;
-             return $this->render('AppBundle:Rss:download.html.twig',array('download'=>$download));
+        $em->flush();
+
+        return $this->render('AppBundle:Rss:download.html.twig',array('download'=>$download));
     }
+    
+    public function downloadAction()
+    {
+         $download = $em->getRepository('AppBundle:Download')->findAll();
+         
+         return $this->render('AppBundle:Rss:download.html.twig',array('download'=>$download));
+    }
+    
+    
     
 }

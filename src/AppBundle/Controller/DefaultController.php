@@ -47,19 +47,15 @@ class DefaultController extends Controller
         return $this->render('AppBundle:Default:index.html.twig',array('serie'=>var_export($series,true)));
     }
     
-    
-    
-    
     // TEST TVDB
      public function tvdbAction()
      {
-         $server = $this->container->getParameter('tvdb_server');
-         $apiKey = $this->container->getParameter('tvdb_api_key');
-         $tvdb = new ServiceTvdb($server,$apiKey);
-
+         $tvdb = $this->get('serviceTvdb');
          // print_r($tvdb->getSerieByName('Walking Dead'));
          // print_r($tvdb->getEpisodesBySerieId(221451));
-         print_r($tvdb->getEpisodeById(250853526));
+         echo '<pre>';
+         var_dump($tvdb->getSerieBannersById(121361));  
+         echo '</pre>';
          die;
           return $this->render('AppBundle:Default:index.html.twig',array('serie'=>var_export($series,true)));
      }

@@ -63,8 +63,9 @@ class SerieController extends Controller
         return $this->render('AppBundle:Default:index.html.twig',array('serie'=>var_export($series,true)));
     }
     
-    public function FunctionName($value='')
+    public function randomBannerAction($tvdbId)
     {
-        # code...
+         $tvdb   = $this->get('serviceTvdb');
+         $banner = $tvdb->getRandomBanner();
     }  
 }

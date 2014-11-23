@@ -12,6 +12,15 @@ series_update:
     pattern:  /series/infos
     defaults: { _controller: AppBundle:Serie:updateInfos }
 
+series_banner:
+    pattern:  /serie/banner/{id}
+    defaults: { _controller: AppBundle:Serie:randomBanner }
+    
+serie_xml:
+   pattern:  /serie/xml
+   defaults: { _controller: AppBundle:Serie:getXmlInfo }
+    
+
 #SEASON
 season_list:
     pattern: /season
@@ -34,10 +43,20 @@ episode_watched:
     pattern: /episode/watched
     defaults: { _controller: AppBundle:Episode:watched }
 #DOWNLOAD
-download_rss:
-   pattern: /download/rss
-   defaults: { _controller: AppBundle:Download:buildRss }
-            
+download_update:
+   pattern: /download/update
+   defaults: { _controller: AppBundle:Download:updateDownload }
+
+download_index:
+    pattern:  /download
+    defaults: { _controller: AppBundle:Download:index }
+  
+#UNSEEN
+unseen_index:
+   pattern: /unseen
+   defaults: { _controller: AppBundle:Unseen:index }
+
+                
 #TEST           
 series_app_tvdb:
     pattern:  /tvdb

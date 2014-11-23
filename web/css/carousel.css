@@ -18,6 +18,7 @@ body {
   right: 0;
   left: 0;
   z-index: 20;
+  opacity: 0.75;
 }
 
 /* Flip around the padding for proper display in narrow viewports */
@@ -65,18 +66,21 @@ body {
 -------------------------------------------------- */
 
 /* Center align the text within the three columns below the carousel */
-.marketing .col-lg-4 {
+.main .col-lg-4 {
   margin-bottom: 20px;
   text-align: center;
 }
-.marketing h2 {
+.main h2 {
   font-weight: normal;
 }
-.marketing .col-lg-4 p {
+.main .col-lg-4 p {
   margin-right: 10px;
   margin-left: 10px;
 }
 
+.main{
+    padding-top :100px;
+}
 
 /* Featurettes
 ------------------------- */

@@ -10,7 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Table(name="Download")
  * @ORM\Entity(repositoryClass="AppBundle\Entity\DownloadRepository")
  */
-class DownloadList
+class Download
 {
     /**
      * @var integer

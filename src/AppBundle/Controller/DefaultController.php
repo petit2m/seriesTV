@@ -54,7 +54,7 @@ class DefaultController extends Controller
          // print_r($tvdb->getSerieByName('Walking Dead'));
          // print_r($tvdb->getEpisodesBySerieId(221451));
          echo '<pre>';
-         var_dump($tvdb->getSerieBannersById(121361));  
+         var_dump($tvdb->getSerieRandomImage(272127,'test'));  
          echo '</pre>';
          die;
           return $this->render('AppBundle:Default:index.html.twig',array('serie'=>var_export($series,true)));

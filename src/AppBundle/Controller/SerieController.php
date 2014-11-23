@@ -63,9 +63,36 @@ class SerieController extends Controller
         return $this->render('AppBundle:Default:index.html.twig',array('serie'=>var_export($series,true)));
     }
     
-    public function randomBannerAction($tvdbId)
+    public function randomBannerAction($id,$type)
     {
+          
          $tvdb   = $this->get('serviceTvdb');
-         $banner = $tvdb->getRandomBanner();
+         $banner = $tvdb->getSerieRandomImage($id,$type);
+      
+          $response = $this->render('AppBundle:Serie:banner.html.twig',array('banner'=>$banner));
+          $response->setPublic();
+          $response->setSharedMaxAge(600);
+          
+          return $response;
     }  
+    
+    // A lancer souvent pour éviter de récupérer trop de données
+    public function getXmlInfoAction()
+    {
+        $em     = $this->getDoctrine()->getManager();
+        $series = $em->getRepository('AppBundle:Serie')->findAll();      
+        $tvdb   = $this->get('serviceTvdb');
+        $date = new \DateTime();
+        $date->modify("-1 day"); //TODO stocker le dernier timestamp de mise à jour
+        $updated= $tvdb->getLastUpdates($date->getTimestamp()); 
+       
+        foreach ($series as $serie) {   
+            if(in_array($serie->getIdTvdb(),$updated))
+                $tvdb->getSerieZip($serie->getIdTvdb()); //TODO logger les updates
+        } 
+        
+        $tvdb->unzipSeries();
+        
+    }
+    
 }

@@ -30,6 +30,8 @@ class ServiceBS
                                     'X-BetaSeries-Key'     => $key,
                                     'X-BetaSeries-Version' => '2.3')
                                 );
+                                
+        $this->login();
                              
     }
     /**
@@ -121,17 +123,29 @@ class ServiceBS
 
     }
     
+    public function getUnseenEpisode($limit=false)
+    {
+        $query='';
+        if($limit)
+            $query='?limit='.$limit;
+        
+        $response = $this->client->get('/episodes/list'.$query, $this->options);
+        
+        return $this->checkResponse($response);
+    }
+    
+    
     public function getEpisodeToDownload()
     {
-        $response = $this->client->get('/episodes/list?limit=1', $this->options);
-        $series = $this->checkResponse($response);
-      
+        $series = $this->getUnseenEpisode();
+    
         if($series){
             foreach ($series['shows'] as $serie)
-                if(!$serie['unseen'][0]['user']['downloaded'])
-                    $downloads[str_replace(' ','.',$serie['title']).'.'.str_replace(' ','.',$serie['unseen'][0]['code'])]=
-                        array('id' => $serie['thetvdb_id'],
-                              'id_episode' => $serie['unseen'][0]['thetvdb_id']);
+                foreach ($serie['unseen'] as $episode) 
+                    if(!$episode['user']['downloaded'])
+                        $downloads[str_replace(' ','.',$serie['title']).'.'.str_replace(' ','.',$episode['code'])]=
+                            array('id' => $serie['thetvdb_id'],
+                                  'id_episode' => $episode['thetvdb_id']);
         }else
             return false;
         

@@ -19,7 +19,6 @@
         "sensio/framework-extra-bundle": "~3.0",
         "incenteev/composer-parameter-handler": "~2.0",
         "guzzlehttp/guzzle": "~5.0",
-	"fabpot/goutte":"~1.0.6"
     },
     "require-dev": {
         "sensio/generator-bundle": "~2.4"

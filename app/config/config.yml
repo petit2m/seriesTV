@@ -4,8 +4,9 @@ imports:
     - { resource: services.yml }
 
 framework:
-    #esi:             ~
+    esi: { enabled: true }
     #translator:      { fallback: "%locale%" }
+    #fragments: { path: /_fragment }
     secret:          "%secret%"
     router:
         resource: "%kernel.root_dir%/config/routing.yml"

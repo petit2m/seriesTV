@@ -63,17 +63,17 @@ class SerieController extends Controller
         return $this->render('AppBundle:Default:index.html.twig',array('serie'=>var_export($series,true)));
     }
     
-    public function randomBannerAction($id,$type)
+    public function randomBannerAction($id,$type,$param=false)
     {
-          
-         $tvdb   = $this->get('serviceTvdb');
-         $banner = $tvdb->getSerieRandomImage($id,$type);
-      
-          $response = $this->render('AppBundle:Serie:banner.html.twig',array('banner'=>$banner));
-          $response->setPublic();
-          $response->setSharedMaxAge(600);
-          
-          return $response;
+           
+        $tvdb   = $this->get('serviceTvdb');
+        $banner = $tvdb->getSerieRandomImage($id,$type,$param);
+            
+        $response = $this->render('AppBundle:Serie:banner.html.twig',array('banner'=>$banner));
+        $response->setPublic();
+        $response->setSharedMaxAge(600);
+         
+        return $response;
     }  
     
     // A lancer souvent pour éviter de récupérer trop de données
@@ -93,6 +93,25 @@ class SerieController extends Controller
         
         $tvdb->unzipSeries();
         
+    }
+    
+    public function viewAction($id)
+    {
+        $em    = $this->getDoctrine()->getManager();
+        $serie = $em->getRepository('AppBundle:Serie')->findById($id);      
+        $tvdb  = $this->get('serviceTvdb');
+        $serieXml = $tvdb->getSerieById($serie[0]->getIdTvdb());
+        $episodes = $tvdb->getEpisodesBySerieId($serie[0]->getIdTvdb());
+       //  echo '<pre>';
+       // var_dump($episodes);
+       // echo '</pre>';die;
+           
+        $response = $this->render('AppBundle:Serie:view.html.twig',array('serie'=>$serieXml[0], 'episodes'=>$episodes));
+        $response->setPublic();
+        $response->setSharedMaxAge(600);
+        
+        return $response;
+       
     }
     
 }

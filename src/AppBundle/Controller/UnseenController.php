@@ -13,7 +13,7 @@ class UnseenController extends Controller
      * Croise un flux Rss de torrent avec mes données de betaséries pour établir la liste des épisodes à télécharger avec leur lien
      * Met à jour une table des épisodes à télécharger
      */
-    public function updatection()
+    public function updateAction()
     {
         $em         = $this->getDoctrine()->getManager();      
         $serviceBS  = $this->get('serviceBS');

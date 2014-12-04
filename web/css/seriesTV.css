@@ -11,6 +11,19 @@ body {
 /* CUSTOMIZE THE NAVBAR
 -------------------------------------------------- */
 
+.modal-dialog {
+    width:800px;
+}
+
+.modal-title{
+    text-align:center;
+}
+.modal-footer p{
+    text-align:left;
+}
+/* CUSTOMIZE THE NAVBAR
+-------------------------------------------------- */
+
 /* Special class on .container surrounding .navbar, used for positioning it into place. */
 .navbar-wrapper {
   position: absolute;
@@ -66,20 +79,25 @@ body {
 -------------------------------------------------- */
 
 /* Center align the text within the three columns below the carousel */
-.main .col-lg-4 {
+.main .miniature {
   margin-bottom: 20px;
   text-align: center;
+  
 }
 .main h2 {
   font-weight: normal;
 }
-.main .col-lg-4 p {
+.main .miniature p {
   margin-right: 10px;
   margin-left: 10px;
 }
 
 .main{
     padding-top :100px;
+}
+
+.main .miniature .col-lg-4{
+    height : 215px;
 }
 
 /* Featurettes
@@ -95,6 +113,33 @@ body {
   line-height: 1;
   letter-spacing: -1px;
 }
+
+/* SEASON
+---------------------------------*/
+.seasons {
+    width: 80%;
+    align-items:center;
+    margin-left: auto;
+    margin-right: auto;
+    
+}
+
+.season h2{
+    text-align:center;
+}
+.season .col-lg-5,
+.season .col-lg-7{
+    height: 500px;
+    margin-bottom: 40px;
+}
+
+
+.season .col-lg-7{
+    -webkit-columns: 2;
+    -moz-columns: 2;
+    columns: 2;
+}
+
 
 
 /* RESPONSIVE CSS
@@ -135,4 +180,64 @@ body {
   .featurette-heading {
     margin-top: 120px;
   }
+}
+
+/* CONSOLE
+------------------------------------------------------ */
+.huge {
+    font-size: 40px;
+}
+
+.panel-green {
+    border-color: #5cb85c;
+}
+
+.panel-green .panel-heading {
+    border-color: #5cb85c;
+    color: #fff;
+    background-color: #5cb85c;
+}
+
+.panel-green a {
+    color: #5cb85c;
+}
+
+.panel-green a:hover {
+    color: #3d8b3d;
+}
+
+.panel-red {
+    border-color: #d9534f;
+}
+
+.panel-red .panel-heading {
+    border-color: #d9534f;
+    color: #fff;
+    background-color: #d9534f;
+}
+
+.panel-red a {
+    color: #d9534f;
+}
+
+.panel-red a:hover {
+    color: #b52b27;
+}
+
+.panel-yellow {
+    border-color: #f0ad4e;
+}
+
+.panel-yellow .panel-heading {
+    border-color: #f0ad4e;
+    color: #fff;
+    background-color: #f0ad4e;
+}
+
+.panel-yellow a {
+    color: #f0ad4e;
+}
+
+.panel-yellow a:hover {
+    color: #df8a13;
 }

@@ -20,8 +20,6 @@ class ServiceTvdb
         $this->client = new Client( array('base_url' => $server, 'defaults'=>array('exceptions' => false) ) );
     }   
     
-
-
     public function getSerieByName($name)
     {
         $xml = $this->getSimpleXmlResponse('GetSeries.php?seriesname='.urlencode($name).'&language='.$this->language);
@@ -52,13 +50,14 @@ class ServiceTvdb
              if ($zip->open($file->getRealpath()) === TRUE) {
                  $zip->extractTo(substr($file->getRealpath(),0,-4));
                  $zip->close();
+                 unlink($file->getRealpath());
              }
          }
     }
 
     public function getSerieById($id)
     {
-        $xml = $this->getSimpleXmlResponse($this->apiKey.'/series/'.$id.'/'.$this->language.'.xml'); 
+        $xml = simplexml_load_file($this->xmlPath.$id.'/en.xml');
         if($xml)
             return $xml->xpath('//Series');
 
@@ -67,9 +66,16 @@ class ServiceTvdb
 
     public function getEpisodesBySerieId($id)
     {
-        $xml = $this->getSimpleXmlResponse($this->apiKey.'/series/'.$id.'/all/'.$this->language.'.xml'); 
-
-        return $xml->xpath('//Episode');
+        $xml = simplexml_load_file($this->xmlPath.$id.'/en.xml');
+         
+        if($xml){
+            foreach ($xml->xpath('//Episode') as $episode) {
+                $episodes[(int)$episode->SeasonNumber][] = $episode;
+            }
+            return $episodes;
+        }
+             
+        return false;
     }
 
     public function getEpisodeById($id)
@@ -79,8 +85,7 @@ class ServiceTvdb
 
     public function getSerieBanners($id, $filter=array())
     {
-
-        $xml = simplexml_load_file($this->xmlPath.$id.'/banners.xml');         // TODO tester le xml
+        $xml = simplexml_load_file($this->xmlPath.$id.'/banners.xml'); // TODO tester le xml
 
         $xpathFilter ='';
         if(!empty($filter)){
@@ -112,7 +117,7 @@ class ServiceTvdb
         return (array)$xml->Series;
     }
     
-    public function getSerieRandomImage($id,$type)
+    public function getSerieRandomImage($id,$type,$param=false)
     {
         switch ($type) {
             case 'large':
@@ -123,18 +128,24 @@ class ServiceTvdb
                 $filter =array('BannerType' => "series",
                                'BannerType2'=> "graphical",
                                'Language'   => "en");   
-                break;              
+                break; 
+            case 'season':
+                $filter =array('BannerType' => "season",
+                               'BannerType2'=> "season",
+                               'Language'   => "en",
+                               'Season'     => (string )$param);   
+                               
+                break;                          
             default:
                 $filter = array();
                 break;
         }
-       
         $xml = $this->getSerieBanners($id,$filter);
        
         if($xml){
           return $xml[rand(0,count($xml)-1)];
         }
-        
+
         return false; // retourner l'url (full ?) de la banner
     }
     

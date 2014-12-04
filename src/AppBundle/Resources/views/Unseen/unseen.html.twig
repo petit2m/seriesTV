@@ -1,12 +1,11 @@
 {% extends 'base.html.twig' %} 
 {% block body %}
  
-    <div class="container main nocarousel">
-        
-        <!-- Three columns of text below the carousel -->
-        <div class="row">
+ <section class="container main"> 
+       <!-- Three columns of text below the carousel -->
+        <div class="row miniature" >
             {% for serie in series.shows%}
-            <div class="col-lg-4 col-ws-1" >
+            <article class="col-lg-4 col-ws-12 " >
                 {{ render_hinclude(controller(
                     'AppBundle:Serie:randomBanner',
                     {'id' : serie.thetvdb_id,'type':'banner'}
@@ -14,7 +13,7 @@
                     <h2>{{ serie.title}}</h2>
                     <p>{{ serie.remaining }} épisode(s) restant(s)</p>
                     <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
-                </div><!-- /.col-lg-4 -->
+                </article><!-- /.col-lg-4 -->
             {% endfor %}
         </div><!-- /.row -->
 
@@ -68,5 +67,5 @@
             <p>&copy; 2014 Company, Inc. &middot; <a href="#">Privacy</a> &middot; <a href="#">Terms</a></p>
         </footer>
 
-    </div><!-- /.container -->
+</section>
 {% endblock %}

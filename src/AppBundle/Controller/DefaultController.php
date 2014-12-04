@@ -69,5 +69,17 @@ class DefaultController extends Controller
          
            return $this->render('AppBundle:Default:index.html.twig',array('serie'=>var_export($series,true)));
       }
+      
+      public function menuAction()
+      {
+          $em       = $this->getDoctrine()->getManager();      
+          $series   = $em->getRepository('AppBundle:Serie')->findAll();
+        
+          $response = $this->render('AppBundle::menu.html.twig',array('series'=>$series));
+          $response->setPublic();
+          $response->setSharedMaxAge(600);
+          
+          return $response;
+      }
 }
 

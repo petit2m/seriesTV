@@ -20,6 +20,9 @@ serie_xml:
    pattern:  /serie/xml
    defaults: { _controller: AppBundle:Serie:getXmlInfo }
     
+serie_view:
+   pattern:  /serie/{id}
+   defaults: { _controller: AppBundle:Serie:view }
 
 #SEASON
 season_list:
@@ -56,7 +59,11 @@ unseen_index:
    pattern: /unseen
    defaults: { _controller: AppBundle:Unseen:index }
 
-                
+#CONSOLE
+console_index:
+    pattern: /console
+    defaults: { _controller: AppBundle:Console:index }              
+    
 #TEST           
 series_app_tvdb:
     pattern:  /tvdb

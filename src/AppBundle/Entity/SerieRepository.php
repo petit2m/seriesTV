@@ -20,5 +20,13 @@ class SerieRepository extends EntityRepository
             ->getResult();
     }
     
+    public function findAll()
+    {
+        return $this->createQueryBuilder('s')
+            ->orderBy('s.name')
+            ->getQuery()
+            ->getResult();
+    }
+    
     
 }

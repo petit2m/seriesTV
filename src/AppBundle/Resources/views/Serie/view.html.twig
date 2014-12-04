@@ -1,0 +1,115 @@
+{% extends 'base.html.twig' %} 
+{% block body %}
+ 
+ <section class="container main"> 
+       <!-- Three columns of text below the carousel -->
+    <header class="row" >
+            <div class="col-lg-7">
+               {{render(controller('AppBundle:Serie:randomBanner',
+                                   {'id' : serie.id,'type':'large'}
+                                   ))
+                }}
+            </div>
+            <div class="col-lg-5">
+                <h1>{{ serie.SeriesName }}<span class="text-muted"></span></h1>
+                <p>{{ serie.Overview }}</p>
+                 
+            </div>
+            <div class="col-lg-5 actors">
+                {{ serie.Actors }}
+            </div>
+    </header>
+    <hr>
+    <section class="row seasons">
+        {% for seasonId,season in episodes %}
+            <article class="season">
+                
+            {% if seasonId > 0 %}
+                <h2 class="text-muted">Season {{ seasonId }}</h2>
+                {% if seasonId is even %}
+                <div class="col-lg-5">
+                   {{render(controller('AppBundle:Serie:randomBanner',
+                                       {'id' : serie.id,'type':'season','param': seasonId}
+                                       ))
+                    }} 
+                </div>
+                {% endif %}             
+                <div class="col-lg-7">
+                    {% for episode in season%}
+                         <p><a href="#" data-toggle="modal" data-target="#episodeModal" data-summary="{{ episode.Overview}}"
+                              data-image="{{episode.filename}}" data-title="{{episode.EpisodeName}}" data-rating="{{episode.Rating}}"
+                              data-votes="{{ episode.RatingCount }}">{{ episode.EpisodeNumber }}.{{ episode.EpisodeName }} </a></p>
+                    {% endfor %}
+                </div>
+                {% if seasonId is odd %}
+                <div class="col-lg-5">
+                {{render(controller('AppBundle:Serie:randomBanner',
+                                    {'id' : serie.id,'type':'season','param': seasonId}
+                                    ))
+                 }} 
+                </div>
+               
+                {% endif %}
+            {% endif %}
+        </article>
+        {% endfor %}
+    </section>
+        <!-- FOOTER -->
+
+    <section class="modal fade" id="episodeModal" tabindex="-1" role="dialog" aria-labelledby="episodeModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <header class="modal-header">
+            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            <h4 class="modal-title" id="episodeModalLabel"></h4>
+          </header>
+          <section class="modal-body row">
+                <div class="col-lg-6">
+                    <img class="img-responsive" rel="noreferrer" src="http://thetvdb.com/banners/">
+                </div>
+                <div class='col-lg-6'>
+                    <p></p>
+                </div>
+          </section>
+          <footer class="modal-footer" >
+              <div class="col-lg-9">
+                  <p></p>
+              </div>
+              <div class="col-lg-3">
+                  <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+          </footer>
+        </div>
+      </div>
+    </section>
+        <!-- FOOTER -->
+    <footer>
+        <p class="pull-right"><a href="#">Back to top</a></p>
+        <p>&copy; 2014 Company, Inc. &middot; <a href="#">Privacy</a> &middot; <a href="#">Terms</a></p>
+    </footer>
+
+</section>
+{% endblock %}
+{% block javascripts %}
+   {{ parent() }}
+    <script>
+   $('#episodeModal').on('show.bs.modal', function (event) {
+     
+     var link    = $(event.relatedTarget) // Button that triggered the modal
+     var summary = link.data('summary') 
+     var title   = link.data('title')   // Extract info from data-* attributes
+     var image   = link.data('image')
+     var rating  = link.data('rating') 
+     var votes  = link.data('votes') 
+     // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
+     // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+     var modal = $(this)
+     modal.find('.modal-title').text(title)
+     modal.find('.modal-body p').text(summary)
+     img = modal.find('.modal-body img')
+     img.attr("src","http://thetvdb.com/banners/" + image)
+     //TODO passer l'url ailleurs...
+     modal.find('.modal-footer p').text('Rating :' + rating + '  (' + votes +' votes)' )
+    })
+    </script>
+{% endblock %}

@@ -1,0 +1,51 @@
+<?php
+
+namespace AppBundle\Entity;
+
+use Doctrine\ORM\Mapping as ORM;
+
+/**
+ * Log
+ *
+ * @ORM\Table(name="Log")
+ * @ORM\Entity(repositoryClass="AppBundle\Entity\LogRepository")
+ */
+class Log
+{
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="id", type="integer", nullable=false)
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="IDENTITY")
+     */
+    private $id;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="type", type="string", length=25)
+     */
+    private $type;
+
+    /**
+     * @var datetime
+     *
+     * @ORM\Column(name="date", type="datetime")
+     */
+    private $date;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="referer", type="string", length=15)
+     */
+    private $user;
+    
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="log", type="string", length=255)
+     */
+    private $log;
+} 

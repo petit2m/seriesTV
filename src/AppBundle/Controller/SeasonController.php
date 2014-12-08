@@ -6,6 +6,8 @@ use AppBundle\Business\ServiceServiio;
 use AppBundle\Business\ServiceTvdb;
 use AppBundle\Entity\Season;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Response;
+
 
 class SeasonController extends Controller
 {
@@ -32,8 +34,8 @@ class SeasonController extends Controller
             }    
         }
         $em->flush();
-
-        return $this->render('AppBundle:Default:index.html.twig',array('serie'=>var_export($season,true)));
+        //TODO enrichir le contenu des reponses pour la vision console
+      return new Response();
     }
     
     public function updateInfosAction()
@@ -54,7 +56,9 @@ class SeasonController extends Controller
                  $em->persist($season); 
             }
         } 
-         $em->flush();                             
+         $em->flush();      
+         
+         return new Response();                       
     }
 
 }

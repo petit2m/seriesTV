@@ -8,9 +8,7 @@ use GuzzleHttp\Message\Response;
 /**
 * Class to access serviio APIs services
 */
-/*
-    TODO voir coment gérer le cache grace aux ETag contenus dans la réponse ?    
-*/
+
 class ServiceServiio 
 {
  
@@ -195,7 +193,7 @@ class ServiceServiio
     
     private function getSimpleParameter(Response $response, $parameter)
     {
-        $res = $response->$this->json();
+        $res = $response->json();
 
         return isset($res[$parameter]) ? $res[$parameter][0] : false;
     }

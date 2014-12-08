@@ -19,23 +19,20 @@ class DownloadController extends Controller
         $serviceBS  = $this->get('serviceBS');
         $rss        = new Rss();
         $seriesRss  = $rss->parse($this->container->getParameter('torrent_rss'));
-        //$serviceBS->login();
         $series     = $serviceBS->getEpisodeToDownload();
-        //$serviceBS->logout();
- //$seriesRss['The.Walking.Dead.S05E05'][]=array('name'=>'test2','url'=>'http://test2');
-        $resultats  = array_intersect_key($seriesRss,$series);
-        // echo'<pre>';
-//         var_dump($series);
-//                 echo'</pre>';die;
+        $resultats  = array_intersect_key($seriesRss,$series); //TODO tester les array()
         foreach($resultats as $name => $resultat){
             arsort($resultat);
             $episode  = array_shift($resultat);
             $downloads = $em->getRepository('AppBundle:Download')->findByIdTvdb($series[$name]['id_episode']);
             $serie   = $em->getRepository('AppBundle:Serie')->findByIdTvdb($series[$name]['id']); 
             
-            if(!$series) //TODO cas à gérer : l'épisode est à regarder mais je n'ai pas la série...
+            if(!$series){
+                //TODO cas à gérer : l'épisode est à regarder mais je n'ai pas la série...
+                // A faire via les logs pour prooser ensuite l'abonnement
                 continue;
-            
+            } 
+                
             if(!$downloads){
                  $download = new Download();
                  $download->setName($episode['name'])
@@ -51,15 +48,13 @@ class DownloadController extends Controller
         }
         $em->flush();
        
-       // return $this->render('AppBundle:Rss:download.html.twig',array('download'=>$download));
+        return new Response();
     }
     
     public function indexAction()
     {
          $em       = $this->getDoctrine()->getManager();     
          $download = $em->getRepository('AppBundle:Download')->findAll();
-         
-         //TODO si vide afficher une bannière random
          
          return $this->render('AppBundle:Download:download.html.twig',array('download'=>$download));
     }

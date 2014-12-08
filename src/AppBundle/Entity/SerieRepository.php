@@ -12,7 +12,7 @@ use Doctrine\ORM\EntityRepository;
  */
 class SerieRepository extends EntityRepository
 {
-    public function getUnfinsihed()
+    public function getUnfinished()
     {
         return $this->createQueryBuilder('s')
             ->where('s.remaining > 0 and s.archived = 0')

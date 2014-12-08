@@ -19,7 +19,8 @@ class ServiceBS
     
     private $password;
     
-    
+    //TODO renommer le répertoire business en service
+    //TODO virer les références à service dans le nom des classes
     function __construct( $server, $key, $user, $password)
     {
         $this->user     = $user;
@@ -164,7 +165,7 @@ class ServiceBS
      * Renvoie les dernières notifications de l'utilisateur connecté
      *
      * @param integer $number   nombre maximum de résultats (10 par défaut, 100 max)
-     * @param string $since_id  TODO voir comment ça marche
+     * @param string $since_id  
      * @param string $episode      type de notifications attendues (badge, banner, bugs, character, commentaire, dons, episode, facebook, film, forum,                                                                         friend, message, quizz, recommend, site, subtitles ou video)
      * @param string $sort         ordre du tri DESC ou ASC
      * @param boolean $auto_delete supprimer les notifications automatiquement  

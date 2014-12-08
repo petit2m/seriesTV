@@ -6,6 +6,8 @@ use AppBundle\Business\ServiceServiio;
 use AppBundle\Business\ServiceBS;
 use AppBundle\Entity\Episode;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Response;
+
 
 class EpisodeController extends Controller
 {
@@ -23,11 +25,18 @@ class EpisodeController extends Controller
             foreach ($serviioEpisodes['objects'] as $serviioEpisode) {
                 $id = $serviioEpisode['id'];
                 $episodes = $em->getRepository('AppBundle:Episode')->findByIdServiio($id);
+                foreach ($serviioEpisode["onlineIdentifiers"] as $onlineId) {
+                    if($onlineId['type'] == 'TVDB'){
+                        $idTvdb = $onlineId['id'];
+                        break;
+                    }
+                }
+                
                 if(!$episodes){
                     $episode = new Episode();
                     $episode->setIdServiio($serviioEpisode['id'])
                             ->setName($serviioEpisode['title'])
-                            ->setIdTvdb($serviioEpisode["onlineIdentifiers"][0]['id'])
+                            ->setIdTvdb($idTvdb)
                             ->setSeason($season);
                 }else{
                     $episode=$episodes[0];
@@ -46,7 +55,7 @@ class EpisodeController extends Controller
         $em->flush();
         $serviceServiio->logout();
         
-        return $this->render('AppBundle:Default:index.html.twig',array('serie'=>var_export($episode,true)));
+        return new Response();
     }
     
     // Envoie les nouveaux épisodes téléchargés à betaseries
@@ -68,14 +77,13 @@ class EpisodeController extends Controller
                 $em->persist($episode);
             }else{
                 echo $episode->getSeason()->getSerie()->getName().'\n';
-                echo 'fail !';
                 //TODO voir pourquoi et ajouter la série ?
             }
         }
         $em->flush();
         $serviceBS->login();
         
-        return true;
+        return new Response();
     }
     
     // Envoie les nouveaux épisodes vus à betaseries
@@ -106,7 +114,7 @@ class EpisodeController extends Controller
         $em->flush();
         $serviceBS->logout();
         
-        return true;
+        return new Response();
     }
     
 }

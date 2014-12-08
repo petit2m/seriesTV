@@ -6,6 +6,7 @@ use AppBundle\Business\ServiceServiio;
 use AppBundle\Business\ServiceTvdb;
 use AppBundle\Entity\Serie;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Response;
 
 class SerieController extends Controller
 {
@@ -27,19 +28,18 @@ class SerieController extends Controller
             }
         }
         $em->flush();
-
-        return $this->render('AppBundle:Default:index.html.twig',array('serie'=>var_export($series,true)));
+        
+        return new Response();
     }
     
     public function updateInfosAction()
     {
-        $em     = $this->getDoctrine()->getManager();
-        $tvdb   = $this->get('serviceTvdb');
-        $bs     = $this->get('serviceBS');
-        $series = $em->getRepository('AppBundle:Serie')->findAll();       
-        $bs->login();
-        $bsInfos   = $bs->getMemberTvdBSeries(); // un seul appel plutôt qu'un par série
-        
+        $em      = $this->getDoctrine()->getManager();
+        $tvdb    = $this->get('serviceTvdb');
+        $bs      = $this->get('serviceBS');
+        $series  = $em->getRepository('AppBundle:Serie')->findAll();       
+        $bsInfos = $bs->getMemberTvdBSeries(); // un seul appel plutôt qu'un par série
+
         foreach ($series as $serie) {
             if($serie->getIdTvdb() == NULL){
                 $tvdbInfos = $tvdb->getSerieByName($serie->getName());
@@ -47,8 +47,8 @@ class SerieController extends Controller
                     $serie->setIdTvdb($tvdbInfos->id);
             }           
             
-            if(isset($bsInfos[$serie->getIdTvdb()])){
-                $serieInfo = $bsInfos[$serie->getIdTvdb()];
+            if(!empty($bsInfos[(int)$serie->getIdTvdb()])){
+                $serieInfo = $bsInfos[(int)$serie->getIdTvdb()];
                 $serie->setNbSeason($serieInfo['seasons']);
                 if($serieInfo['in_account'] === true){
                     $serie->setRemaining($serieInfo['user']['remaining']);
@@ -60,7 +60,8 @@ class SerieController extends Controller
         }
         $em->flush();
         $bs->logout();
-        return $this->render('AppBundle:Default:index.html.twig',array('serie'=>var_export($series,true)));
+       
+        return new Response();
     }
     
     public function randomBannerAction($id,$type,$param=false)
@@ -83,16 +84,17 @@ class SerieController extends Controller
         $series = $em->getRepository('AppBundle:Serie')->findAll();      
         $tvdb   = $this->get('serviceTvdb');
         $date = new \DateTime();
-        $date->modify("-1 day"); //TODO stocker le dernier timestamp de mise à jour
+        $date->modify("-2 year"); //TODO stocker le dernier timestamp de mise à jour
         $updated= $tvdb->getLastUpdates($date->getTimestamp()); 
-       
+      
         foreach ($series as $serie) {   
-            if(in_array($serie->getIdTvdb(),$updated))
+      //      if(in_array($serie->getIdTvdb(),$updated))
                 $tvdb->getSerieZip($serie->getIdTvdb()); //TODO logger les updates
         } 
         
         $tvdb->unzipSeries();
         
+        return new Response();
     }
     
     public function viewAction($id)

@@ -6,6 +6,7 @@ use AppBundle\Entity\Download;
 use AppBundle\Business\ServiceBS;
 use AppBundle\Business\Rss;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Response;
 
 class UnseenController extends Controller
 {
@@ -19,22 +20,19 @@ class UnseenController extends Controller
         $serviceBS  = $this->get('serviceBS');
         $rss        = new Rss();
         $seriesRss  = $rss->parse($this->container->getParameter('torrent_rss'));
-        $serviceBS->login();
         $series     = $serviceBS->getEpisodeToDownload();
         $serviceBS->logout();
- //$seriesRss['The.Walking.Dead.S05E05'][]=array('name'=>'test2','url'=>'http://test2');
         $resultats  = array_intersect_key($seriesRss,$series);
-        // echo'<pre>';
-//         var_dump($series);
-//                 echo'</pre>';die;
         foreach($resultats as $name => $resultat){
             arsort($resultat);
             $episode  = array_shift($resultat);
             $downloads = $em->getRepository('AppBundle:Download')->findByIdTvdb($series[$name]['id_episode']);
             $serie   = $em->getRepository('AppBundle:Serie')->findByIdTvdb($series[$name]['id']); 
             
-            if(!$series) //TODO cas à gérer : l'épisode est à regarder mais je n'ai pas la série...
-                continue;
+            if(!$series){
+              //TODO cas à gérer : l'épisode est à regarder mais je n'ai pas la série...
+              // utiliser les logs pour tracer l'événement et proposer par la suite de s'abonner à la série
+            } 
             
             if(!$downloads){
                  $download = new Download();
@@ -50,15 +48,14 @@ class UnseenController extends Controller
              $em->persist($download);
         }
         $em->flush();
-       
-       // return $this->render('AppBundle:Rss:download.html.twig',array('download'=>$download));
+        
+        return new Response();
     }
     
     public function indexAction()
     {
        $serviceBS  = $this->get('serviceBS');
        $series    = $serviceBS->getUnseenEpisode();
-      // die;
        $response = $this->render('AppBundle:Unseen:unseen.html.twig',array('series'=>$series));
        
        $response->setPublic();

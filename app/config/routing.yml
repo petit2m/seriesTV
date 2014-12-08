@@ -16,8 +16,8 @@ series_banner:
     pattern:  /serie/banner/{id}
     defaults: { _controller: AppBundle:Serie:randomBanner }
     
-serie_xml:
-   pattern:  /serie/xml
+series_xml:
+   pattern:  /series/xml
    defaults: { _controller: AppBundle:Serie:getXmlInfo }
     
 serie_view:
@@ -26,24 +26,24 @@ serie_view:
 
 #SEASON
 season_list:
-    pattern: /season
+    pattern: /seasons
     defaults: { _controller: AppBundle:Season:listServiio }
 
 season_update:
-    pattern:  /season/infos
+    pattern:  /seasons/infos
     defaults: { _controller: AppBundle:Season:updateInfos }
     
 #EPISODE
-episode_list:
-    pattern: /episode
+episodes_list:
+    pattern: /episodes
     defaults: { _controller: AppBundle:Episode:listServiio }
 
 episode_dowloaded:
-    pattern: /episode/downloaded
+    pattern: /episodes/downloaded
     defaults: { _controller: AppBundle:Episode:downloaded }
 
 episode_watched:
-    pattern: /episode/watched
+    pattern: /episodes/watched
     defaults: { _controller: AppBundle:Episode:watched }
 #DOWNLOAD
 download_update:
@@ -80,3 +80,11 @@ series_app_rss:
 series_app_betaseries:
     pattern:  /bs/{format}
     defaults: { _controller: AppBundle:Default:bs, format: json }
+    
+#SECURITY
+login:
+    pattern:   /login
+    defaults:  { _controller: AcmeSecurityBundle:Security:login }
+    
+login_check:
+    pattern:   /login_check

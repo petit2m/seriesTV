@@ -47,7 +47,7 @@ class Serie
      *
      * @ORM\Column(name="nb_season", type="integer", options={"default":1})
      */
-    private $nbSeason;
+    private $nbSeason=1;
 
     /**
      * @var integer

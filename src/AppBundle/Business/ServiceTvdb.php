@@ -23,8 +23,12 @@ class ServiceTvdb
     public function getSerieByName($name)
     {
         $xml = $this->getSimpleXmlResponse('GetSeries.php?seriesname='.urlencode($name).'&language='.$this->language);
-        $series = $xml->xpath('//Series');
         
+        if(!$xml)
+            return false;
+        
+        $series = $xml->xpath('//Series');
+
         if(!empty($series))
             return $series[0];
         
@@ -85,8 +89,11 @@ class ServiceTvdb
 
     public function getSerieBanners($id, $filter=array())
     {
-        $xml = simplexml_load_file($this->xmlPath.$id.'/banners.xml'); // TODO tester le xml
-
+        $xml = simplexml_load_file($this->xmlPath.$id.'/banners.xml');
+        
+        if(!$xml)
+            return false;
+        
         $xpathFilter ='';
         if(!empty($filter)){
             $xpathFilter = '[';
@@ -146,7 +153,7 @@ class ServiceTvdb
           return $xml[rand(0,count($xml)-1)];
         }
 
-        return false; // retourner l'url (full ?) de la banner
+        return false;
     }
     
     private function getSimpleXmlResponse($url)

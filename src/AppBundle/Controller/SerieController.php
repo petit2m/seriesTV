@@ -16,7 +16,7 @@ class SerieController extends Controller
         $em             = $this->getDoctrine()->getManager();
         $serviceServiio->authenticate();
         $series = $serviceServiio->browse('V_S');
-        
+       
         foreach ($series['objects'] as $serviioSerie) {
             $id = $serviioSerie['id'];
             $serie = $em->getRepository('AppBundle:Serie')->findByIdServiio($id);
@@ -88,8 +88,10 @@ class SerieController extends Controller
         $updated= $tvdb->getLastUpdates($date->getTimestamp()); 
       
         foreach ($series as $serie) {   
-      //      if(in_array($serie->getIdTvdb(),$updated))
+            if(in_array($serie->getIdTvdb(),$updated)){
                 $tvdb->getSerieZip($serie->getIdTvdb()); //TODO logger les updates
+            break;  
+            }
         } 
         
         $tvdb->unzipSeries();
@@ -104,11 +106,17 @@ class SerieController extends Controller
         $tvdb  = $this->get('serviceTvdb');
         $serieXml = $tvdb->getSerieById($serie[0]->getIdTvdb());
         $episodes = $tvdb->getEpisodesBySerieId($serie[0]->getIdTvdb());
-       //  echo '<pre>';
-       // var_dump($episodes);
-       // echo '</pre>';die;
-           
-        $response = $this->render('AppBundle:Serie:view.html.twig',array('serie'=>$serieXml[0], 'episodes'=>$episodes));
+        $actors   = $tvdb->getSerieActorsById($serie[0]->getIdTvdb());
+        // echo '<pre>';
+    //    var_dump($actors);
+    //    echo '</pre>';die;
+        if($serieXml && $episodes && $actors)   
+            $response = $this->render('AppBundle:Serie:view.html.twig',array('serie'    =>$serieXml[0], 
+                                                                             'episodes' => $episodes, 
+                                                                             'actors'   => $actors));
+        else
+            return new Response('Serie inconnue !',500);                                                                       
+                                                                            
         $response->setPublic();
         $response->setSharedMaxAge(600);
         

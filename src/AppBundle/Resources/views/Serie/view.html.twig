@@ -15,45 +15,74 @@
                 <p>{{ serie.Overview }}</p>
                  
             </div>
-            <div class="col-lg-5 actors">
-                {{ serie.Actors }}
-            </div>
     </header>
-    <hr>
-    <section class="row seasons">
-        {% for seasonId,season in episodes %}
-            <article class="season">
-                
-            {% if seasonId > 0 %}
-                <h2 class="text-muted">Season {{ seasonId }}</h2>
-                {% if seasonId is even %}
-                <div class="col-lg-5">
-                   {{render(controller('AppBundle:Serie:randomBanner',
-                                       {'id' : serie.id,'type':'season','param': seasonId}
-                                       ))
-                    }} 
-                </div>
-                {% endif %}             
-                <div class="col-lg-7">
-                    {% for episode in season%}
-                         <p><a href="#" data-toggle="modal" data-target="#episodeModal" data-summary="{{ episode.Overview}}"
-                              data-image="{{episode.filename}}" data-title="{{episode.EpisodeName}}" data-rating="{{episode.Rating}}"
-                              data-votes="{{ episode.RatingCount }}">{{ episode.EpisodeNumber }}.{{ episode.EpisodeName }} </a></p>
-                    {% endfor %}
-                </div>
-                {% if seasonId is odd %}
-                <div class="col-lg-5">
-                {{render(controller('AppBundle:Serie:randomBanner',
-                                    {'id' : serie.id,'type':'season','param': seasonId}
-                                    ))
-                 }} 
-                </div>
-               
-                {% endif %}
-            {% endif %}
-        </article>
-        {% endfor %}
+ 
+<section class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+  <article class="panel panel-default">
+    <header class="panel-heading" role="tab" id="headingOne">
+      <h4 class="panel-title">
+        <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+          Actors
+        </a>
+      </h4>
+    </header>
+    <section id="collapseOne" class="panel-collapse collapse in clearfix" role="tabpanel" aria-labelledby="headingOne">  
+      {% for actor in actors %}
+          <article class="col-md-1 portrait">
+              <img class="img-responsive" alt="{{ actor.Role }}" title="{{ actor.Role }}" src="http://thetvdb.com/banners/_cache/{{ actor.Image}}">
+               <h6>{{actor.Name }}</h6>
+          </article>
+      {% endfor %}
     </section>
+  </article>
+  <article class="panel panel-default">
+    <header class="panel-heading" role="tab" id="headingTwo">
+      <h4 class="panel-title">
+        <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+          Seasons
+        </a>
+      </h4>
+    </header>
+    <section id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+      <section class="row seasons">
+          {% for seasonId,season in episodes %}
+              <article class="season">
+                
+              {% if seasonId > 0 %}
+                  <h2 class="text-muted">Season {{ seasonId }}</h2>
+                  {% if seasonId is even %}
+                  <div class="col-lg-5">
+                     {{render(controller('AppBundle:Serie:randomBanner',
+                                         {'id' : serie.id,'type':'season','param': seasonId}
+                                         ))
+                      }} 
+                  </div>
+                  {% endif %}             
+                  <div class="col-lg-7">
+                      {% for episode in season%}
+                           <p><a href="#" data-toggle="modal" data-target="#episodeModal" data-summary="{{ episode.Overview}}"
+                                data-image="{{episode.filename}}" data-title="{{episode.EpisodeName}}" data-rating="{{episode.Rating}}"
+                                data-votes="{{ episode.RatingCount }}">{{ episode.EpisodeNumber }}.{{ episode.EpisodeName }} </a></p>
+                      {% endfor %}
+                  </div>
+                  {% if seasonId is odd %}
+                  <div class="col-lg-5">
+                  {{render(controller('AppBundle:Serie:randomBanner',
+                                      {'id' : serie.id,'type':'season','param': seasonId}
+                                      ))
+                   }} 
+                  </div>
+               
+                  {% endif %}
+              {% endif %}
+          </article>
+          {% endfor %}
+      </section>
+    </section>
+  </article>
+</section>
+    <hr>
+   
         <!-- FOOTER -->
 
     <section class="modal fade" id="episodeModal" tabindex="-1" role="dialog" aria-labelledby="episodeModalLabel" aria-hidden="true">
@@ -65,7 +94,7 @@
           </header>
           <section class="modal-body row">
                 <div class="col-lg-6">
-                    <img class="img-responsive" rel="noreferrer" src="http://thetvdb.com/banners/">
+                    <img class="img-responsive" rel="noreferrer" src="">
                 </div>
                 <div class='col-lg-6'>
                     <p></p>
@@ -110,6 +139,7 @@
      img.attr("src","http://thetvdb.com/banners/" + image)
      //TODO passer l'url ailleurs...
      modal.find('.modal-footer p').text('Rating :' + rating + '  (' + votes +' votes)' )
+     //voir si on peut mettre un système d'étoile pour le rating ?
     })
     </script>
 {% endblock %}

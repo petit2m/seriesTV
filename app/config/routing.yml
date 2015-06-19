@@ -84,7 +84,7 @@ series_app_betaseries:
 #SECURITY
 login:
     pattern:   /login
-    defaults:  { _controller: AcmeSecurityBundle:Security:login }
+    defaults:  { _controller: AppBundle:Default:login }
     
 login_check:
     pattern:   /login_check

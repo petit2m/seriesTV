@@ -6,7 +6,7 @@
         <div class="row miniature" >
             {% for serie in series.shows%}
             <article class="col-lg-4 col-ws-12 " >
-                {{ render_hinclude(controller(
+                {{ render_hinclude (controller(
                     'AppBundle:Serie:randomBanner',
                     {'id' : serie.thetvdb_id,'type':'banner'}
                     )) }}

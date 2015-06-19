@@ -114,6 +114,19 @@ body {
   letter-spacing: -1px;
 }
 
+/* PORTRAIT 
+---------------------------------*/
+.portrait{
+    height:180px;
+    padding:5px;
+}
+
+.portrait .h5,
+.portrai .h6{
+    margin-top:5px;
+    margin-bottom:5px;
+}
+
 /* SEASON
 ---------------------------------*/
 .seasons {

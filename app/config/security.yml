@@ -11,14 +11,14 @@
 #         default:
 #             anonymous: ~
 
-security:
-    providers:
-        in_memory:
-            memory: ~
-    firewalls:
-        secured_area:
-            pattern:    ^/
-            anonymous: ~
-            form_login:
-                login_path:  /login
-                check_path:  /login_check
+# security:
+#     providers:
+#         in_memory:
+#             memory: ~
+#     firewalls:
+#         secured_area:
+#             pattern:    ^/
+#             anonymous: ~
+#             form_login:
+#                 login_path:  /login
+#                 check_path:  /login_check

@@ -25,11 +25,9 @@ class DefaultController extends Controller
     public function serviioAction()
     {
 		
-	   $server = $this->container->getParameter('serviio_server');
-       $password       = $this->container->getParameter('serviio_password');
-       $serviceServiio = new ServiceServiio($server ,$password);
+	  $serviceServiio = $this->get('serviceServiio');
        $serviceServiio->authenticate();
-       $series = $serviceServiio->getInfos('v','VOSTFR');
+       $series = $serviceServiio->browse('V_S^SER_705^SSN_7');
       // $series = $serviceServiio->modified("W/\"6a4db39d-2a76-4c94-b1f5-c0bc605f9b02\"");
        /*
         foreach ($series as $idSerie => $seasons) {
@@ -44,6 +42,10 @@ class DefaultController extends Controller
              }
         }
         */
+       echo '<pre>';
+       var_dump($series);  
+       echo '</pre>';
+       die;
         return $this->render('AppBundle:Default:index.html.twig',array('serie'=>var_export($series,true)));
     }
     

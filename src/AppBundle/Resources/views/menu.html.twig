@@ -26,7 +26,7 @@
                     <li class="divider"></li>
                     <li class="dropdown-header">Liste</li>
                     {% for serie in series %}
-                        <li><a href="#">{{ serie.name }}</a></li>
+                        <li><a href="{{ path('serie_view', {'id': serie.id}) }}">{{ serie.name }}</a></li>
                     {% endfor %}
                   </ul>
                 </li>

@@ -9,7 +9,7 @@ use GuzzleHttp\Message\Response;
 * Class to access serviio APIs services
 */
 
-class ServiceServiio 
+class ServiceServiio extends Service
 {
  
     private $client;

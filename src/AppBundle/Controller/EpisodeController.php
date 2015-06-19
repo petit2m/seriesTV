@@ -18,10 +18,10 @@ class EpisodeController extends Controller
         $em             = $this->getDoctrine()->getManager();
         $seasons        = $em->getRepository('AppBundle:Season')->getActive();
         $serviceServiio->authenticate();       
-            
+
         foreach ($seasons as $season) {
             $serviioEpisodes = $serviceServiio->browse($season->getIdServiio());
-        
+
             foreach ($serviioEpisodes['objects'] as $serviioEpisode) {
                 $id = $serviioEpisode['id'];
                 $episodes = $em->getRepository('AppBundle:Episode')->findByIdServiio($id);
@@ -49,7 +49,7 @@ class EpisodeController extends Controller
                 }
                 $em->persist($episode); 
             }  
-            $episode->getSeason()->setNbDownloadedEpisode(count($serviioEpisodes['objects']));  
+            $season->setNbDownloadedEpisode(count($serviioEpisodes['objects']));  
             $em->persist($season);
         }
         $em->flush();

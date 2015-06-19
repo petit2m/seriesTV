@@ -11,6 +11,11 @@ use Symfony\Component\Finder\Finder;
 */
 class ServiceTvdb
 {
+    
+    const INFOS   = 'en.xml';
+    const ACTORS = 'actors.xml';
+    const BANNER = 'banners.xml';
+        
     function __construct($server, $api_key, $path, $language='en')
     {
         $this->language = $language;
@@ -38,6 +43,7 @@ class ServiceTvdb
     public function getSerieZip($id)
     {
         $serieZip = $this->client->get($this->apiKey.'/series/'.$id.'/all/'.$this->language.'.zip');
+        var_dump($serieZip);
         $fp = fopen($this->xmlPath.$id.'.zip', 'w');
         fwrite($fp, $serieZip->getBody());
         fclose($fp);  
@@ -51,7 +57,9 @@ class ServiceTvdb
                         ->name('*.zip');
         $zip = new \ZipArchive;
         foreach ($finder as $file) {
+            echo $file->getRealpath();
              if ($zip->open($file->getRealpath()) === TRUE) {
+                
                  $zip->extractTo(substr($file->getRealpath(),0,-4));
                  $zip->close();
                  unlink($file->getRealpath());
@@ -61,7 +69,7 @@ class ServiceTvdb
 
     public function getSerieById($id)
     {
-        $xml = simplexml_load_file($this->xmlPath.$id.'/en.xml');
+        $xml = $this->loadXml($id);
         if($xml)
             return $xml->xpath('//Series');
 
@@ -70,7 +78,7 @@ class ServiceTvdb
 
     public function getEpisodesBySerieId($id)
     {
-        $xml = simplexml_load_file($this->xmlPath.$id.'/en.xml');
+        $xml = $this->loadXml($id);
          
         if($xml){
             foreach ($xml->xpath('//Episode') as $episode) {
@@ -89,7 +97,7 @@ class ServiceTvdb
 
     public function getSerieBanners($id, $filter=array())
     {
-        $xml = simplexml_load_file($this->xmlPath.$id.'/banners.xml');
+        $xml = $this->loadXml($id,self::BANNER);
         
         if(!$xml)
             return false;
@@ -109,7 +117,12 @@ class ServiceTvdb
 
     public function getSerieActorsById($id)
     {
-        return $this->getSimpleXmlResponse($this->apiKey.'/series/'.$id.'/actors.xml');           
+        $xml = $this->loadXml($id,self::ACTORS);
+        
+        if($xml)
+            return (array)$xml->xpath('//Actor');
+        
+        return false;
     }
 
     public function getServerTime()
@@ -165,7 +178,19 @@ class ServiceTvdb
 
          return $response->xml();
     }
-    
-    
+    /**
+     * retourne le xml d'une serie
+     *
+     * @param string $filename 
+     * @return void
+     * @author Niko
+     */
+    private function loadXml($id,$filename=self::INFOS)
+    {
+      if(file_exists($this->xmlPath.$id.'/'.$filename))
+          return simplexml_load_file($this->xmlPath.$id.'/'.$filename);
+      
+      return false; //TODO logger une erreur
+  }
     
 }

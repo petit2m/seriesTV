@@ -8,7 +8,7 @@ use GuzzleHttp\Message\Response;
 /**
 * Classe to use BetaSeries API
 */
-class ServiceBS
+class ServiceBS extends Service
 {
     
     private $client;
@@ -21,6 +21,7 @@ class ServiceBS
     
     //TODO renommer le répertoire business en service
     //TODO virer les références à service dans le nom des classes
+    //TODO moyen l'auto connect dans le construct
     function __construct( $server, $key, $user, $password)
     {
         $this->user     = $user;
@@ -46,7 +47,14 @@ class ServiceBS
     {
         $options['body'] = array('login'     => $this->user,
                                   'password' => $this->password);
-        $response = $this->client->post('/members/auth', array_merge($this->options,$options));
+                                 
+        try{
+            $response = $this->client->post('/members/auth', array_merge($this->options,$options));
+        }catch(\Exception $e ){
+            echo $e->getMessage();
+            exit();
+        }
+        
         $res      = $this->checkResponse($response);
         
         if(!$res)
@@ -194,6 +202,7 @@ class ServiceBS
      */
     public function setDownloaded($tvdb_id)
     {
+        $options['body']['thetvdb_id'] = $tvdb_id;
         $response = $this->client->post('/episodes/downloaded', array_merge($this->options,$options));
         
         return $this->checkResponse($response);
@@ -207,7 +216,7 @@ class ServiceBS
      * @return le résultat de l'opération
      * @author Niko
      */
-    public function setWatched($tvdb_id, $bulk=true)
+    public function setWatched($tvdb_id, $bulk='true')
     {
         $options['body'] = array('thetvdb_id' => $tvdb_id,
                                  'bulk'       => $bulk);

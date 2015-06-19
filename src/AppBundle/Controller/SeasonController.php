@@ -43,9 +43,8 @@ class SeasonController extends Controller
         $bs      = $this->get('serviceBS');
         $em      = $this->getDoctrine()->getManager();
         $seasons = $em->getRepository('AppBundle:Season')->findAll();
-        $bs->login();
+       
         $bsInfos   = $bs->getMemberTvdBSeries(); // un seul appel plutôt qu'un par série
-
         foreach ($seasons as $season) {
             if (isset($bsInfos[$season->getSerie()->getIdTvdb()])) {
             //    TODO sortir le code spécifique au json dans le service
